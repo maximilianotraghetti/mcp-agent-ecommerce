@@ -1,4 +1,4 @@
-# 🛍️ Chatbot de E-commerce con Gemini
+# 🛍️ Chatbot de E-commerce mcp
 
 Sistema de chatbot para soporte al cliente usando **FastAPI**, **Google Gemini** y el patrón **MCP (Model Context Protocol)**.
 
