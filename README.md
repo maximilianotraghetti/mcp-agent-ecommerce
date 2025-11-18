@@ -6,16 +6,7 @@ Sistema de chatbot para soporte al cliente usando **FastAPI**, **Google Gemini**
 
 ### 1. Instalar dependencias
 
-Crea un archivo `requirements.txt`:
-```
-fastapi==0.104.1
-uvicorn==0.24.0
-google-generativeai==0.3.2
-python-dotenv==1.0.0
-pydantic==2.5.0
-```
-
-Luego instala:
+ instala:
 ```bash
 uv sync
 ```
