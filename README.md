@@ -6,7 +6,7 @@ Sistema de chatbot para soporte al cliente usando **FastAPI**, **Google Gemini**
 
 ### 1. Instalar dependencias
 
- instala:
+ Ejecuta
 ```bash
 uv sync
 ```
