@@ -77,6 +77,20 @@ TOOLS = [
             },
             "required": ["tipo_info"]
         }
+    },
+    {
+        "name": "obtener_historial_compras",
+        "description": "Obtiene el historial completo de compras de un cliente usando su email. Muestra todos los pedidos anteriores con sus estados, productos y fechas.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "description": "Email del cliente para buscar su historial de compras"
+                }
+            },
+            "required": ["email"]
+        }
     }
 ]
 
@@ -208,7 +222,7 @@ def consultar_info_plataforma(tipo_info: str) -> Dict[str, Any]:
                 "error": True,
                 "mensaje": f"Tipo de información '{tipo_info}' no disponible. Tipos válidos: {', '.join(INFO_PLATAFORMA.keys())}"
             }
-        
+
         return {
             "error": False,
             "tipo": tipo_info,
@@ -221,6 +235,56 @@ def consultar_info_plataforma(tipo_info: str) -> Dict[str, Any]:
         }
 
 
+def obtener_historial_compras(email: str) -> Dict[str, Any]:
+    """Obtiene el historial completo de compras de un cliente"""
+    try:
+        email = email.lower().strip()
+        historial = []
+
+        for pedido_id, pedido in PEDIDOS.items():
+            if pedido.get("email", "").lower() == email:
+                pedido_info = {
+                    "id_orden": pedido["id"],
+                    "fecha": pedido["fecha"],
+                    "estado": pedido["estado"],
+                    "productos": pedido["productos"],
+                    "total_productos": len(pedido["productos"])
+                }
+
+                if "direccion" in pedido:
+                    pedido_info["direccion"] = pedido["direccion"]
+
+                if "tracking" in pedido:
+                    pedido_info["tracking_info"] = pedido["tracking"]
+
+                if "fecha_entrega" in pedido:
+                    pedido_info["fecha_entrega"] = pedido["fecha_entrega"]
+
+                historial.append(pedido_info)
+
+        if not historial:
+            return {
+                "error": True,
+                "mensaje": f"No se encontraron compras para el email: {email}. Verifica que el email sea correcto o que hayas realizado compras con nosotros."
+            }
+
+        # Ordenamos por fecha (más reciente primero)
+        historial.sort(key=lambda x: x["fecha"], reverse=True)
+
+        return {
+            "error": False,
+            "email": email,
+            "total_pedidos": len(historial),
+            "historial": historial,
+            "resumen": f"Se encontraron {len(historial)} pedido(s) para este cliente"
+        }
+    except Exception as e:
+        return {
+            "error": True,
+            "mensaje": f"Error al obtener historial de compras: {str(e)}"
+        }
+
+
 # Mapeo de nombres de herramientas a funciones
 TOOL_FUNCTIONS = {
     "consultar_stock": consultar_stock,
@@ -228,7 +292,8 @@ TOOL_FUNCTIONS = {
     "consultar_categorias": consultar_categorias,
     "rastrear_pedido": rastrear_pedido,
     "explicar_politica_devolucion": explicar_politica_devolucion,
-    "consultar_info_plataforma": consultar_info_plataforma
+    "consultar_info_plataforma": consultar_info_plataforma,
+    "obtener_historial_compras": obtener_historial_compras
 }
 
 

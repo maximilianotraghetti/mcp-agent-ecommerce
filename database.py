@@ -70,6 +70,7 @@ PEDIDOS = {
     "ORD-001": {
         "id": "ORD-001",
         "cliente": "Juan Pérez",
+        "email": "juan.perez@email.com",
         "productos": ["Remera Básica (M)", "Pantalón Jean (32)"],
         "estado": "En preparación",
         "fecha": "2024-11-15",
@@ -78,6 +79,7 @@ PEDIDOS = {
     "ORD-002": {
         "id": "ORD-002",
         "cliente": "María García",
+        "email": "maria.garcia@email.com",
         "productos": ["Zapatillas Deportivas (40)"],
         "estado": "En camino",
         "fecha": "2024-11-14",
@@ -87,10 +89,29 @@ PEDIDOS = {
     "ORD-003": {
         "id": "ORD-003",
         "cliente": "Carlos López",
+        "email": "carlos.lopez@email.com",
         "productos": ["Campera de Abrigo (L)", "Gorra Deportiva"],
         "estado": "Entregado",
         "fecha": "2024-11-10",
         "fecha_entrega": "2024-11-13"
+    },
+    "ORD-004": {
+        "id": "ORD-004",
+        "cliente": "Ana Martínez",
+        "email": "ana.martinez@email.com",
+        "productos": ["Remera Básica (S)", "Gorra Deportiva"],
+        "estado": "Entregado",
+        "fecha": "2024-11-08",
+        "fecha_entrega": "2024-11-11"
+    },
+    "ORD-005": {
+        "id": "ORD-005",
+        "cliente": "Juan Pérez",
+        "email": "juan.perez@email.com",
+        "productos": ["Zapatillas Deportivas (42)"],
+        "estado": "Entregado",
+        "fecha": "2024-11-05",
+        "fecha_entrega": "2024-11-07"
     }
 }
 
