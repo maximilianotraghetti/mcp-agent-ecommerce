@@ -155,6 +155,18 @@ def get_sessions():
         "count": len(sessions_data)
     }
 
+@app.get("/sessions/{session_id}/history")
+def get_session_history(session_id: str):
+    """Retorna el historial de mensajes de una sesión"""
+    if session_id not in conversaciones:
+        return {"session_id": session_id, "history": [], "exists": False}
+    
+    return {
+        "session_id": session_id,
+        "history": conversaciones[session_id]["history"],
+        "exists": True
+    }
+
 
 @app.post("/chat", response_model=ChatResponse)
 async def chat(request: ChatRequest):
