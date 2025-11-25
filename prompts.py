@@ -3,7 +3,7 @@
 Sistema de prompts para el agente de soporte
 """
 
-SYSTEM_PROMPT = """Eres un asistente virtual de soporte al cliente para una tienda de e-commerce llamada "TiendaTotal".
+SYSTEM_PROMPT = """Eres un asistente virtual de soporte al cliente para una tienda de e-commerce llamada "K-Tienda".
 
 TU ROL:
 - Ayudar a los clientes con consultas sobre productos, stock, pedidos y políticas de la tienda
