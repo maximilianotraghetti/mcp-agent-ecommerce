@@ -1,7 +1,14 @@
 import { useState, useEffect, useCallback } from "react";
 import type { MouseEvent } from "react";
 import { chatRepository } from "../repositories/ChatRepository";
-import { MessageSquare, Plus, Trash2, Menu, X } from "lucide-react";
+import {
+  MessageSquare,
+  Plus,
+  Trash2,
+  Menu,
+  X,
+  AlertTriangle,
+} from "lucide-react";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -19,6 +26,7 @@ export function Sidebar({
   onToggle,
 }: SidebarProps) {
   const [sessions, setSessions] = useState<string[]>([]);
+  const [sessionToDelete, setSessionToDelete] = useState<string | null>(null);
 
   const loadSessions = useCallback(async () => {
     try {
@@ -37,21 +45,28 @@ export function Sidebar({
     return () => clearInterval(interval);
   }, [loadSessions]);
 
-  const handleDelete = async (e: MouseEvent, id: string) => {
+  const handleDeleteClick = (e: MouseEvent, id: string) => {
     e.stopPropagation();
-    if (confirm("¿Estás seguro de que quieres eliminar esta conversación?")) {
-      try {
-        await chatRepository.deleteSession(id);
-        await loadSessions();
-        if (currentSessionId === id) {
-          onNewSession();
-        }
-      } catch (error) {
-        console.error("Failed to delete session", error);
+    setSessionToDelete(id);
+  };
+  const handleConfirmDelete = async () => {
+    if (!sessionToDelete) return;
+
+    try {
+      await chatRepository.deleteSession(sessionToDelete);
+      await loadSessions();
+      if (currentSessionId === sessionToDelete) {
+        onNewSession();
       }
+      setSessionToDelete(null);
+    } catch (error) {
+      console.error("Failed to delete session", error);
     }
   };
 
+  const handleCancelDelete = () => {
+    setSessionToDelete(null);
+  };
   return (
     <>
       {/* Mobile overlay */}
@@ -124,7 +139,7 @@ export function Sidebar({
                 </span>
               </div>
               <button
-                onClick={(e) => handleDelete(e, session)}
+                onClick={(e) => handleDeleteClick(e, session)}
                 className="btn btn-ghost btn-xs btn-square opacity-0 group-hover:opacity-100 transition-opacity text-error"
               >
                 <Trash2 size={14} />
@@ -153,6 +168,49 @@ export function Sidebar({
           <Menu size={20} />
         </button>
       )}
+      {/* Delete Confirmation Modal - DaisyUI */}
+      <input
+        type="checkbox"
+        id="delete_modal"
+        className="modal-toggle"
+        checked={sessionToDelete !== null}
+        onChange={() => {}}
+      />
+      <div className="modal modal-bottom sm:modal-middle">
+        <div className="modal-box">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-12 h-12 rounded-full bg-error/10 flex items-center justify-center">
+              <AlertTriangle className="text-error" size={24} />
+            </div>
+            <h3 className="font-bold text-lg">Eliminar Conversación</h3>
+          </div>
+
+          <p className="py-4 text-base-content/80">
+            ¿Estás seguro de que quieres eliminar esta conversación?
+            <br />
+            <span className="font-semibold text-base-content">
+              {sessionToDelete?.replace("session_", "Conversación ")}
+            </span>
+          </p>
+
+          <div className="modal-action">
+            <button onClick={handleCancelDelete} className="btn btn-ghost">
+              Cancelar
+            </button>
+            <button onClick={handleConfirmDelete} className="btn btn-error">
+              <Trash2 size={16} />
+              Eliminar
+            </button>
+          </div>
+        </div>
+        <label
+          className="modal-backdrop"
+          htmlFor="delete_modal"
+          onClick={handleCancelDelete}
+        >
+          Close
+        </label>
+      </div>
     </>
   );
 }
