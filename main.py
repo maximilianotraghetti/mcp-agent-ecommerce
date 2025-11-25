@@ -4,6 +4,7 @@ API FastAPI para el sistema de chat con MCP usando Gemini
 """
 
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware  
 from pydantic import BaseModel
 from typing import List, Dict, Any, Optional
 import google.generativeai as genai
@@ -22,6 +23,15 @@ app = FastAPI(
     title="E-commerce MCP API (Gemini)",
     description="Sistema de chat con herramientas para soporte de e-commerce usando Gemini",
     version="1.0.0"
+)
+
+# ==================== CONFIGURAR CORS ====================
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],  # Frontend URL
+    allow_credentials=True,
+    allow_methods=["*"],  # Permitir todos los métodos (GET, POST, etc.)
+    allow_headers=["*"],  # Permitir todos los headers
 )
 
 # Configurar Gemini
