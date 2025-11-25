@@ -31,7 +31,14 @@ export function Sidebar({
   const loadSessions = useCallback(async () => {
     try {
       const data = await chatRepository.getSessions();
-      setSessions(data.sessions);
+      // Sort sessions by ID (newer sessions have larger timestamps)
+      const sortedSessions = data.sessions.sort((a, b) => {
+        // Extract timestamp from session_${timestamp} format
+        const timeA = parseInt(a.id.replace("session_", "")) || 0;
+        const timeB = parseInt(b.id.replace("session_", "")) || 0;
+        return timeB - timeA; // Descending order (newest first)
+      });
+      setSessions(sortedSessions);
     } catch (error) {
       console.error("Failed to load sessions", error);
     }

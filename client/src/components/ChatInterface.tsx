@@ -31,7 +31,25 @@ export function ChatInterface({ sessionId, sessionName }: ChatInterfaceProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setMessages([]);
+    const loadHistory = async () => {
+      try {
+        const data = await chatRepository.getSessionHistory(sessionId);
+        if (data.exists && data.history.length > 0) {
+          setMessages(
+            data.history.map((msg) => ({
+              role: msg.role as "user" | "assistant",
+              content: msg.content,
+            }))
+          );
+        } else {
+          setMessages([]);
+        }
+      } catch (error) {
+        console.error("Failed to load history", error);
+        setMessages([]);
+      }
+    };
+    loadHistory();
   }, [sessionId]);
 
   const scrollToBottom = () => {

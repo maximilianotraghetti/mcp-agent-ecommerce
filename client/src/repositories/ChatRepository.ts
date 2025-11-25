@@ -70,4 +70,15 @@ export const chatRepository = {
     const response = await axios.get<ToolsResponse>(`${API_URL}/tools`);
     return response.data;
   },
+
+  async getSessionHistory(session_id: string): Promise<{
+    session_id: string;
+    history: Array<{ role: string; content: string }>;
+    exists: boolean;
+  }> {
+    const response = await axios.get(
+      `${API_URL}/sessions/${session_id}/history`
+    );
+    return response.data;
+  },
 };
