@@ -76,6 +76,17 @@ def convertir_tools_a_gemini(tools):
     
     return gemini_tools
 
+async def generar_nombre_sesion(primer_mensaje: str) -> str:
+    """Genera un nombre descriptivo para la sesión basado en el primer mensaje"""
+    try:
+        model = genai.GenerativeModel(model_name=MODEL_NAME)
+        prompt = f"Genera un título corto (máximo 5 palabras) para esta conversación: '{primer_mensaje}'. Responde solo con el título, sin comillas ni puntuación adicional."
+        
+        response = model.generate_content(prompt)
+        nombre = response.text.strip()
+        return nombre[:50]  # Limitar longitud
+    except:
+        return f"Chat {primer_mensaje[:20]}..."
 
 # Convertir tools
 GEMINI_TOOLS = convertir_tools_a_gemini(TOOLS)
@@ -131,10 +142,17 @@ def get_tools():
 
 @app.get("/sessions")
 def get_sessions():
-    """Retorna las sesiones activas"""
+    """Retorna las sesiones activas con sus nombres"""
+    sessions_data = [
+        {
+            "id": session_id,
+            "name": data.get("session_name", f"Chat {session_id}")
+        }
+        for session_id, data in conversaciones.items()
+    ]
     return {
-        "sessions": list(conversaciones.keys()),
-        "count": len(conversaciones)
+        "sessions": sessions_data,
+        "count": len(sessions_data)
     }
 
 
@@ -150,6 +168,8 @@ async def chat(request: ChatRequest):
         
         # Inicializar conversación si no existe
         if session_id not in conversaciones:
+            # Generar nombre automáticamente
+            session_name = await generar_nombre_sesion(user_message)
             # Crear modelo con configuración - USAR MODEL_NAME
             model = genai.GenerativeModel(
                 model_name=MODEL_NAME,  # ← Usar la constante con -latest
@@ -159,7 +179,8 @@ async def chat(request: ChatRequest):
             # Iniciar chat
             conversaciones[session_id] = {
                 "chat": model.start_chat(enable_automatic_function_calling=False),
-                "history": []
+                "history": [],
+                "session_name": session_name
             }
         
         chat = conversaciones[session_id]["chat"]

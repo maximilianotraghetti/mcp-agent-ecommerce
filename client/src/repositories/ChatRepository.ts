@@ -19,8 +19,13 @@ export interface ChatResponse {
   tool_calls?: ToolCall[];
 }
 
+export interface Session {
+  id: string;
+  name: string;
+}
+
 export interface SessionListResponse {
-  sessions: string[];
+  sessions: Session[];
   count: number;
 }
 

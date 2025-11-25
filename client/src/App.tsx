@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { chatRepository } from "./repositories/ChatRepository";
 import { ChatInterface } from "./components/ChatInterface";
 import { Sidebar } from "./components/Sidebar";
 
@@ -7,6 +8,25 @@ function App() {
     return localStorage.getItem("chat_session_id") || `session_${Date.now()}`;
   });
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [currentSessionName, setCurrentSessionName] = useState<string>("");
+
+  useEffect(() => {
+    const loadSessions = async () => {
+      try {
+        const data = await chatRepository.getSessions();
+        const currentSession = data.sessions.find((s) => s.id === sessionId);
+        setCurrentSessionName(currentSession?.name || "Nueva Conversación");
+      } catch (error) {
+        console.error("Failed to load sessions", error);
+        setCurrentSessionName("Nueva Conversación");
+      }
+    };
+
+    loadSessions();
+    // Poll for updates
+    const interval = setInterval(loadSessions, 5000);
+    return () => clearInterval(interval);
+  }, [sessionId]);
 
   useEffect(() => {
     localStorage.setItem("chat_session_id", sessionId);
@@ -31,7 +51,7 @@ function App() {
         onToggle={() => setIsSidebarOpen(!isSidebarOpen)}
       />
       <main className="flex-1 flex flex-col h-full relative">
-        <ChatInterface sessionId={sessionId} />
+        <ChatInterface sessionId={sessionId} sessionName={currentSessionName} />{" "}
       </main>
     </div>
   );

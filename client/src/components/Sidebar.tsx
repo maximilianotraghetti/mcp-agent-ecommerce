@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import type { MouseEvent } from "react";
-import { chatRepository } from "../repositories/ChatRepository";
+import { chatRepository, type Session } from "../repositories/ChatRepository";
 import {
   MessageSquare,
   Plus,
@@ -25,7 +25,7 @@ export function Sidebar({
   onNewSession,
   onToggle,
 }: SidebarProps) {
-  const [sessions, setSessions] = useState<string[]>([]);
+  const [sessions, setSessions] = useState<Session[]>([]);
   const [sessionToDelete, setSessionToDelete] = useState<string | null>(null);
 
   const loadSessions = useCallback(async () => {
@@ -114,32 +114,32 @@ export function Sidebar({
         <div className="flex-1 overflow-y-auto px-2 py-2 space-y-1">
           {sessions.map((session) => (
             <div
-              key={session}
-              onClick={() => onSessionSelect(session)}
+              key={session.id}
+              onClick={() => onSessionSelect(session.id)}
               className={`
-                group flex items-center justify-between p-3 rounded-lg cursor-pointer transition-all
-                ${
-                  currentSessionId === session
-                    ? "bg-base-100 shadow-sm"
-                    : "hover:bg-base-100/50"
-                }
-              `}
+      group flex items-center justify-between p-3 rounded-lg cursor-pointer transition-all
+      ${
+        currentSessionId === session.id
+          ? "bg-base-100 shadow-sm"
+          : "hover:bg-base-100/50"
+      }
+    `}
             >
               <div className="flex items-center gap-3 overflow-hidden">
                 <MessageSquare
                   size={18}
                   className={
-                    currentSessionId === session
+                    currentSessionId === session.id
                       ? "text-primary"
                       : "text-base-content/50"
                   }
                 />
                 <span className="truncate text-sm font-medium">
-                  {session.replace("session_", "Conversación ")}
+                  {session.name}
                 </span>
               </div>
               <button
-                onClick={(e) => handleDeleteClick(e, session)}
+                onClick={(e) => handleDeleteClick(e, session.id)}
                 className="btn btn-ghost btn-xs btn-square opacity-0 group-hover:opacity-100 transition-opacity text-error"
               >
                 <Trash2 size={14} />
@@ -189,7 +189,8 @@ export function Sidebar({
             ¿Estás seguro de que quieres eliminar esta conversación?
             <br />
             <span className="font-semibold text-base-content">
-              {sessionToDelete?.replace("session_", "Conversación ")}
+              {sessions.find((s) => s.id === sessionToDelete)?.name ||
+                sessionToDelete}
             </span>
           </p>
 

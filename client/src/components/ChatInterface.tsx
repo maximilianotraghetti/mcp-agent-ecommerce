@@ -21,9 +21,10 @@ interface Message {
 
 interface ChatInterfaceProps {
   sessionId: string;
+  sessionName: string;
 }
 
-export function ChatInterface({ sessionId }: ChatInterfaceProps) {
+export function ChatInterface({ sessionId, sessionName }: ChatInterfaceProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -113,7 +114,7 @@ export function ChatInterface({ sessionId }: ChatInterfaceProps) {
       <div className="navbar bg-base-100 border-b border-base-200 px-4 lg:px-8">
         <div className="flex-1">
           <h2 className="text-lg font-bold">
-            {sessionId.replace("session_", "Conversación ")}
+            {sessionName || "Nueva Conversación"}
           </h2>
         </div>
       </div>
