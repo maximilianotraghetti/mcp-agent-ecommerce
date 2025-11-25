@@ -1,6 +1,16 @@
 import { useState, useEffect, useRef } from "react";
 import { chatRepository, type ToolCall } from "../repositories/ChatRepository";
-import { SendHorizonal, Loader2, Bot, User, Terminal } from "lucide-react";
+import {
+  SendHorizonal,
+  Loader2,
+  Bot,
+  User,
+  Terminal,
+  Sparkles,
+  Package,
+  Truck,
+  RotateCcw,
+} from "lucide-react";
 import ReactMarkdown from "react-markdown";
 
 interface Message {
@@ -66,6 +76,37 @@ export function ChatInterface({ sessionId }: ChatInterfaceProps) {
     }
   };
 
+  const handleQuickAction = async (message: string) => {
+    if (isLoading) return;
+
+    setMessages((prev) => [...prev, { role: "user", content: message }]);
+    setIsLoading(true);
+
+    try {
+      const response = await chatRepository.sendMessage(sessionId, message);
+
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: response.response,
+          toolCalls: response.tool_calls,
+        },
+      ]);
+    } catch (error) {
+      console.error("Failed to send message", error);
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: "Lo siento, algo salió mal. Por favor, intenta de nuevo.",
+        },
+      ]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="flex flex-col h-full bg-base-100">
       {/* Header */}
@@ -80,7 +121,7 @@ export function ChatInterface({ sessionId }: ChatInterfaceProps) {
       {/* Messages Area */}
       <div className="flex-1 overflow-y-auto p-4 lg:p-8 space-y-6">
         {messages.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full text-base-content/80 space-y-4">
+          <div className="flex flex-col items-center justify-center h-full text-base-content/80 space-y-6">
             <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center text-primary">
               <Bot size={32} />
             </div>
@@ -91,6 +132,44 @@ export function ChatInterface({ sessionId }: ChatInterfaceProps) {
               Soy tu asistente virtual. Puedo ayudarte con consultas sobre
               stock, productos, seguimiento de pedidos y políticas de la tienda.
             </p>
+
+            {/* Quick Actions */}
+            <div className="w-full max-w-2xl px-4">
+              <div className="flex items-center gap-2 mb-3 justify-center">
+                <Sparkles size={16} className="text-primary" />
+                <span className="text-sm font-medium">Acciones rápidas</span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <button
+                  onClick={() =>
+                    handleQuickAction("¿Qué productos tienen disponibles?")
+                  }
+                  className="btn btn-outline gap-2 justify-start"
+                  disabled={isLoading}
+                >
+                  <Package size={18} />
+                  <span className="text-left">Ver productos</span>
+                </button>
+                <button
+                  onClick={() => handleQuickAction("Quiero rastrear mi pedido")}
+                  className="btn btn-outline gap-2 justify-start"
+                  disabled={isLoading}
+                >
+                  <Truck size={18} />
+                  <span className="text-left">Rastrear pedido</span>
+                </button>
+                <button
+                  onClick={() =>
+                    handleQuickAction("¿Cuál es la política de devolución?")
+                  }
+                  className="btn btn-outline gap-2 justify-start"
+                  disabled={isLoading}
+                >
+                  <RotateCcw size={18} />
+                  <span className="text-left">Devoluciones</span>
+                </button>
+              </div>
+            </div>
           </div>
         ) : (
           messages.map((msg, idx) => (
